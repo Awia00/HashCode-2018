@@ -40,7 +40,7 @@ namespace Windemann.HashCode.Qualification
 
             var priorityQueue = new SortedSet<BbNode>(new BbNodeComparer());
             var bestNode = root;
-            var incumbent = 0;
+            var incumbent = root.LowerBound;
 
             priorityQueue.Add(root);
             while (priorityQueue.Any() && !_cancellationToken.IsCancellationRequested)
