@@ -7,16 +7,23 @@ namespace Windemann.HashCode.Qualification.Heuristics
 {
     public class QualificationSolverSingleVehicle : IQualificationSolver
     {
-        public QualificationResult Solve(QualificationInstance instance)
-        {
-            var rides = new HashSet<Ride>(instance.Rides);
-            var result = new QualificationResult(instance);
+        private readonly QualificationInstance _instance;
 
-            for (var i = 0; i < instance.NumberOfVehicles; i++)
+        public QualificationSolverSingleVehicle(QualificationInstance instance)
+        {
+            _instance = instance;
+        }
+        
+        public QualificationResult Solve()
+        {
+            var rides = new HashSet<Ride>(_instance.Rides);
+            var result = new QualificationResult(_instance);
+
+            for (var i = 0; i < _instance.NumberOfVehicles; i++)
             {
                 var vehicle = new Vehicle();
 
-                foreach (var ride in ChooseRidesForVehicle(instance, vehicle, rides))
+                foreach (var ride in ChooseRidesForVehicle(_instance, vehicle, rides))
                 {
                     result.AddAssignment(vehicle.Id, ride.Id);
                 }
@@ -24,7 +31,6 @@ namespace Windemann.HashCode.Qualification.Heuristics
 
             return result;
         }
-
 
         public IEnumerable<Ride> ChooseRidesForVehicle(QualificationInstance instance, Vehicle vehicle, IEnumerable<Ride> rides)
         {

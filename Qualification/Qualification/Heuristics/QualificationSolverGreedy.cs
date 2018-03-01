@@ -7,17 +7,24 @@ namespace Windemann.HashCode.Qualification.Heuristics
 {
     public class QualificationSolverGreedy : IQualificationSolver
     {
-        public QualificationResult Solve(QualificationInstance instance)
+        private readonly QualificationInstance _instance;
+
+        public QualificationSolverGreedy(QualificationInstance instance)
+        {
+            _instance = instance;
+        }
+        
+        public QualificationResult Solve()
         {
             var vehicles = new List<Vehicle>();
-            for (var i = 0; i < instance.NumberOfVehicles; i++)
+            for (var i = 0; i < _instance.NumberOfVehicles; i++)
             {
                 vehicles.Add(new Vehicle());
             }
 
             Console.Error.WriteLine("Created vehicles");
 
-            return Solve(instance, vehicles);
+            return Solve(_instance, vehicles);
         }
 
         public QualificationResult Solve(QualificationInstance instance, IEnumerable<Vehicle> vehicles)
