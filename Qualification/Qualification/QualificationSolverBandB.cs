@@ -44,7 +44,7 @@ namespace Windemann.HashCode.Qualification
             var incumbent = 0;
 
             priorityQueue.Add(root);
-            while (priorityQueue.Any() || !_cancellationToken.IsCancellationRequested)
+            while (priorityQueue.Any() && !_cancellationToken.IsCancellationRequested)
             {                
                 var node = priorityQueue.Min;
                 priorityQueue.Remove(node);
