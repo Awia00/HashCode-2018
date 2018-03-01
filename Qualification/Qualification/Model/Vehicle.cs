@@ -6,18 +6,16 @@ namespace Windemann.HashCode.Qualification.Model
 {
     public class Vehicle
     {
+        private static int _id;
+
+        public int Id { get; }
         public Coordinate Position { get; set; }
         public int TimeAvailable { get; set; } // Tells when the car is available from Position.
 
         public Vehicle()
         {
+            Id = _id++;
             Position = new Coordinate();
-        }
-
-        public Vehicle(Coordinate position, int timeAvailable)
-        {
-            Position = position;
-            TimeAvailable = timeAvailable;
         }
     }
 }
