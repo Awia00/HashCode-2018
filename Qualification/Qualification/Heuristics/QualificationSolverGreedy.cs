@@ -9,14 +9,21 @@ namespace Windemann.HashCode.Qualification.Heuristics
     {
         public QualificationResult Solve(QualificationInstance instance)
         {
-            var timeQueue = new SortedSet<Vehicle>(new VehicleTimeComparer());
+            var vehicles = new List<Vehicle>();
             for (var i = 0; i < instance.NumberOfVehicles; i++)
             {
-                timeQueue.Add(new Vehicle());
+                vehicles.Add(new Vehicle());
             }
 
             Console.Error.WriteLine("Created vehicles");
 
+            return Solve(instance, vehicles);
+        }
+
+        public QualificationResult Solve(QualificationInstance instance, IEnumerable<Vehicle> vehicles)
+        {
+            var timeQueue = new SortedSet<Vehicle>(vehicles, new VehicleTimeComparer());
+            
             var result = new QualificationResult(instance);
             var ridesLeft = instance.Rides.ToList();
 

@@ -16,22 +16,33 @@ namespace Windemann.HashCode.Qualification.Heuristics
             {
                 var vehicle = new Vehicle();
 
-                while (rides.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps)))
+                foreach (var ride in ChooseRidesForVehicle(instance, vehicle, rides))
                 {
-                    var chosenRide = rides
-                        .Where(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps))
-                        .OrderByDescending(ride => ride.Score(instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(ride.Start)))
-                        .First();
-
-                    result.AddAssignment(vehicle.Id, chosenRide.Id);
-                    rides.Remove(chosenRide);
-
-                    vehicle.Position = chosenRide.End;
-                    vehicle.TimeAvailable = vehicle.PossiblePickupTime(chosenRide) + chosenRide.Distance;
+                    result.AddAssignment(vehicle.Id, ride.Id);
                 }
             }
 
             return result;
+        }
+
+
+        public IEnumerable<Ride> ChooseRidesForVehicle(QualificationInstance instance, Vehicle vehicle, IEnumerable<Ride> rides)
+        {
+            var rideSet = new HashSet<Ride>(rides);
+            
+            while (rideSet.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps)))
+            {
+                var chosenRide = rideSet
+                    .Where(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps))
+                    .OrderByDescending(ride => ride.Score(instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(ride.Start)))
+                    .First();
+
+                yield return chosenRide;
+                rideSet.Remove(chosenRide);
+
+                vehicle.Position = chosenRide.End;
+                vehicle.TimeAvailable = vehicle.PossiblePickupTime(chosenRide) + chosenRide.Distance;
+            }
         }
     }
 }

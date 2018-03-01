@@ -72,6 +72,7 @@ namespace Windemann.HashCode.Qualification
 
         private int UpperBound(BbNode node)
         {
+            
             return 0;
         }
 
