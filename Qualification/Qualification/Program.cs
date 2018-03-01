@@ -24,8 +24,8 @@ namespace Windemann.HashCode.Qualification
             
             Console.Error.WriteLine("Instance has been parsed.");
 
-            // var solver = new QualificationSolverBandB(instance, tokenSource.Token);
-            var solver = new QualificationSolverGreedy(instance);
+            var solver = new QualificationSolverBandB(instance, tokenSource.Token);
+//            var solver = new QualificationSolverGreedy(instance);
             var result = solver.Solve();
 
             Console.Error.WriteLine("Result has been computed.");

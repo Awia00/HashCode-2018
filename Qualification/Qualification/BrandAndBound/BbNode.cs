@@ -23,9 +23,16 @@ namespace Windemann.HashCode.Qualification
         public BbNode(BbNode node)
         {
             Assignments = new List<Assignment>(node.Assignments);
-            Conflicts = new Dictionary<int, HashSet<int>>(node.Conflicts);
+            
+            Conflicts = new Dictionary<int, HashSet<int>>();
+
+            foreach (var key in node.Conflicts.Keys)
+            {
+                Conflicts.Add(key, new HashSet<int>(node.Conflicts[key]));
+            }
+            
             Vehicles = new List<Vehicle>(node.Vehicles);
-            Rides = new SortedSet<Ride>(node.Rides);
+            Rides = new SortedSet<Ride>(node.Rides, node.Rides.Comparer);
         }
     }
 }

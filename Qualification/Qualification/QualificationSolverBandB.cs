@@ -22,6 +22,7 @@ namespace Windemann.HashCode.Qualification
             _cancellationToken = cancellationToken;
         }
         
+        
         public QualificationResult Solve()
         {
             var vehicles = new List<Vehicle>();
@@ -29,19 +30,15 @@ namespace Windemann.HashCode.Qualification
             {
                 vehicles.Add(new Vehicle());
             }
-            var ridesLeft = new SortedSet<Ride>(new RideComparer());
-            foreach (var instanceRide in _instance.Rides)
-            {
-                ridesLeft.Add(instanceRide);
-            }
+            var ridesLeft = new SortedSet<Ride>(_instance.Rides, new RideComparer());
 
             var root = new BbNode(_instance.NumberOfVehicles);
-            root.LowerBound = LowerBound(root);
-            root.UpperBound = UpperBound(root);
             root.Vehicles = vehicles;
             root.Rides = ridesLeft;
+            root.LowerBound = LowerBound(root);
+            root.UpperBound = UpperBound(root);
 
-            var priorityQueue = new SortedSet<BbNode>();
+            var priorityQueue = new SortedSet<BbNode>(new BbNodeComparer());
             var bestNode = root;
             var incumbent = 0;
 
@@ -54,23 +51,20 @@ namespace Windemann.HashCode.Qualification
                 if(node.UpperBound <= incumbent)
                     continue;
 
-                var (take, stay) = GetChildren(node);
-                take.UpperBound = UpperBound(take);
-                take.LowerBound = LowerBound(take);
-                stay.UpperBound = UpperBound(stay);
-                stay.LowerBound = LowerBound(stay);
-
-                if (node.LowerBound > incumbent)
+                foreach (var child in GetChildren(node))
                 {
-                    incumbent = node.LowerBound;
-                    bestNode = node;
+                    child.UpperBound = UpperBound(child);
+                    child.LowerBound = LowerBound(child);
+                    
+                    if (child.LowerBound > incumbent)
+                    {
+                        incumbent = child.LowerBound;
+                        bestNode = child;
+                    }
+                    
+                    if (!MustBePruned(child, incumbent))
+                        priorityQueue.Add(child);
                 }
-
-                if (!MustBePruned(take, incumbent))
-                    priorityQueue.Add(take);
-
-                if (!MustBePruned(stay, incumbent))
-                    priorityQueue.Add(stay);
             }
 
             var result = new QualificationResult(_instance);
@@ -98,14 +92,13 @@ namespace Windemann.HashCode.Qualification
         }
 
 
-        private (BbNode take, BbNode stay) GetChildren(BbNode node)
+        private IEnumerable<BbNode> GetChildren(BbNode node)
         {
             Ride pickedRide = null;
             Vehicle pickedVehicle = null;
             foreach (var nodeVehicle in node.Vehicles)
             {
-                var ride = node.Rides.FirstOrDefault(x =>
-                    nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, _instance.NumberOfSteps)
+                var ride = node.Rides.FirstOrDefault(x => nodeVehicle.CanPickup(x, _instance.NumberOfSteps)
                     && !node.Conflicts[nodeVehicle.Id].Contains(x.Id));
                 if (ride != null)
                 {
@@ -117,7 +110,7 @@ namespace Windemann.HashCode.Qualification
 
             if (pickedRide == null)
             {
-                return (new BbNode(_instance.NumberOfVehicles), new BbNode(_instance.NumberOfVehicles)); // they will have bad bounds
+                return Enumerable.Empty<BbNode>();
             }
 
             var stay = new BbNode(node);
@@ -127,21 +120,22 @@ namespace Windemann.HashCode.Qualification
 
             take.Rides.Remove(pickedRide);
             var takeVehicle = take.Vehicles.Find(x => x.Id == pickedVehicle.Id);
-            takeVehicle.TimeAvailable += takeVehicle.PossiblePickupTime(pickedRide) + pickedRide.Distance;
+            take.Vehicles.Remove(takeVehicle);
+            take.Vehicles.Add(new Vehicle(takeVehicle.Id, pickedRide.End, takeVehicle.PossiblePickupTime(pickedRide) + pickedRide.Distance));
 
-            take.Assignments.Add(new Assignment()
+            take.Assignments.Add(new Assignment
             {
                 RideId = pickedRide.Id,
                 VehicleId = takeVehicle.Id,
-                Value = pickedRide.Distance + (pickedVehicle.PossiblePickupTime(pickedRide) == pickedRide.EarliestStart ? _instance.PerRideBonus : 0)
+                Value = pickedRide.Score(_instance, pickedVehicle.PossiblePickupTime(pickedRide))
             });
 
-            return (take, stay);
+            return new []{take, stay};
         }
 
         private int UpperBound(BbNode node)
         {
-            return node.Vehicles.Sum(vehicle => _upperHeuristic.ChooseRidesForVehicle(vehicle, node.Rides).Sum(r => r.Score));
+            return node.Vehicles.Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides).Sum(r => r.Score));
         }
 
         private int LowerBound(BbNode node)
