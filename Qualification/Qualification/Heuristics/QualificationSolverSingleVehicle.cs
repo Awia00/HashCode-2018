@@ -23,27 +23,27 @@ namespace Windemann.HashCode.Qualification.Heuristics
             {
                 var vehicle = new Vehicle();
 
-                foreach (var ride in ChooseRidesForVehicle(_instance, vehicle, rides))
+                foreach (var ride in ChooseRidesForVehicle(vehicle, rides))
                 {
-                    result.AddAssignment(vehicle.Id, ride.Id);
+                    result.AddAssignment(vehicle.Id, ride.Ride.Id);
                 }
             }
 
             return result;
         }
 
-        public IEnumerable<Ride> ChooseRidesForVehicle(QualificationInstance instance, Vehicle vehicle, IEnumerable<Ride> rides)
+        public IEnumerable<(Ride Ride, int Score)> ChooseRidesForVehicle(Vehicle vehicle, IEnumerable<Ride> rides)
         {
             var rideSet = new HashSet<Ride>(rides);
             
-            while (rideSet.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps)))
+            while (rideSet.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, _instance.NumberOfSteps)))
             {
                 var chosenRide = rideSet
-                    .Where(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps))
-                    .OrderByDescending(ride => ride.Score(instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(ride.Start)))
+                    .Where(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, _instance.NumberOfSteps))
+                    .OrderByDescending(ride => ride.Score(_instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(ride.Start)))
                     .First();
 
-                yield return chosenRide;
+                yield return (chosenRide, chosenRide.Score(_instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(chosenRide.Start)));
                 rideSet.Remove(chosenRide);
 
                 vehicle.Position = chosenRide.End;

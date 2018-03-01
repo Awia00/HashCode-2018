@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Windemann.HashCode.Qualification.Heuristics;
 using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
@@ -8,10 +9,12 @@ namespace Windemann.HashCode.Qualification
     public class QualificationSolverBandB : IQualificationSolver
     {
         private readonly QualificationInstance _instance;
+        private readonly QualificationSolverSingleVehicle _upperHeuristic;
 
         public QualificationSolverBandB(QualificationInstance instance)
         {
             _instance = instance;
+            _upperHeuristic = new QualificationSolverSingleVehicle(_instance);
         }
         
         public QualificationResult Solve()
@@ -97,12 +100,14 @@ namespace Windemann.HashCode.Qualification
 
         private int UpperBound(BbNode node)
         {
-            return 0;
+            return node.Vehicles.Sum(vehicle => _upperHeuristic.ChooseRidesForVehicle(vehicle, node.Rides).Sum(r => r.Score));
         }
 
         private int LowerBound(BbNode node)
         {
-            return 0;
+            var solver = new QualificationSolverGreedy(_instance);
+
+            return solver.Solve(node.Vehicles, node.Rides).Sum(r => r.Score);
         }
     }
 }

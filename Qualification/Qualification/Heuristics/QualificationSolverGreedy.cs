@@ -24,15 +24,21 @@ namespace Windemann.HashCode.Qualification.Heuristics
 
             Console.Error.WriteLine("Created vehicles");
 
-            return Solve(_instance, vehicles);
+            var result = new QualificationResult(_instance);
+            
+            foreach (var assignment in Solve(vehicles, _instance.Rides))
+            {
+                result.AddAssignment(assignment.VehicleId, assignment.RideId);
+            }
+            
+            return result;
         }
 
-        public QualificationResult Solve(QualificationInstance instance, IEnumerable<Vehicle> vehicles)
+        public IEnumerable<(int VehicleId, int RideId, int Score)> Solve(IEnumerable<Vehicle> vehicles, IEnumerable<Ride> rides)
         {
             var timeQueue = new SortedSet<Vehicle>(vehicles, new VehicleTimeComparer());
             
-            var result = new QualificationResult(instance);
-            var ridesLeft = instance.Rides.ToList();
+            var ridesLeft = rides.ToList();
 
             do
             {
@@ -40,22 +46,21 @@ namespace Windemann.HashCode.Qualification.Heuristics
                 timeQueue.Remove(vehicle);
 
                 var pickedRide = ridesLeft
-                    .OrderBy(x => x.LatestFinish + 1d/x.Distance + (vehicle.TimeAvailable + x.Start.DistanceTo(vehicle.Position) <= x.EarliestStart ? instance.PerRideBonus : 0))
-                    .FirstOrDefault(x => vehicle.TimeAvailable + x.Distance + x.Start.DistanceTo(vehicle.Position) < Math.Min(instance.NumberOfSteps, x.LatestFinish));
+                    .OrderBy(x => x.LatestFinish + 1d/x.Distance + (vehicle.TimeAvailable + x.Start.DistanceTo(vehicle.Position) <= x.EarliestStart ? _instance.PerRideBonus : 0))
+                    .FirstOrDefault(x => vehicle.PossiblePickupTime(x) + x.Distance < Math.Min(_instance.NumberOfSteps, x.LatestFinish));
 
                 if (pickedRide != null)
                 {
-                    vehicle.TimeAvailable = Math.Max(vehicle.TimeAvailable + vehicle.Position.DistanceTo(pickedRide.Start), pickedRide.EarliestStart) + pickedRide.Distance;
+                    yield return (vehicle.Id, pickedRide.Id, pickedRide.Score(_instance, vehicle.PossiblePickupTime(pickedRide)));
+                    
+                    vehicle.TimeAvailable = vehicle.PossiblePickupTime(pickedRide)  + pickedRide.Distance;
                     vehicle.Position = pickedRide.End;
                     timeQueue.Add(vehicle);
                     ridesLeft.Remove(pickedRide);
-                    result.AddAssignment(vehicle.Id, pickedRide.Id);
                     Console.Error.Write($"\rAssigned ride {pickedRide.Id} to vehicle {vehicle.Id}");
                 }
             } while (timeQueue.Any());
             Console.Error.WriteLine();
-
-            return result;
         }
     }
 }
