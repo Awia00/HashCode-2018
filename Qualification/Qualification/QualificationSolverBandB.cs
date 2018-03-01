@@ -88,12 +88,24 @@ namespace Windemann.HashCode.Qualification
 
         private (BbNode node1, BbNode node2) GetChildren(BbNode node)
         {
+            Ride picked = null;
             foreach (var nodeVehicle in node.Vehicles)
             {
-                node.Rides.FirstOrDefault(x =>
+                var ride = node.Rides.FirstOrDefault(x =>
                     nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, _instance.NumberOfSteps));
+                if (ride != null)
+                {
+                    picked = ride;
+                    break;
+                }
             }
 
+            if (picked == null)
+            {
+                return (new BbNode(), new BbNode()); // they will have bad bounds
+            }
+            var take = new BbNode();
+            var stay = new BbNode();
             return (node, node);
         }
 
