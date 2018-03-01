@@ -44,14 +44,8 @@ namespace Windemann.HashCode.Qualification
             var incumbent = 0;
 
             priorityQueue.Add(root);
-            while (priorityQueue.Any())
-            {
-                if (_cancellationToken.IsCancellationRequested)
-                {
-                    // TODO: Make the solution from this.
-                    throw new NotImplementedException();
-                }
-                
+            while (priorityQueue.Any() || !_cancellationToken.IsCancellationRequested)
+            {                
                 var node = priorityQueue.Min;
                 priorityQueue.Remove(node);
                 
@@ -82,6 +76,10 @@ namespace Windemann.HashCode.Qualification
             {
                 result.AddAssignment(bestNodeAssignment.VehicleId, bestNodeAssignment.RideId);
             }
+            var solver = new QualificationSolverGreedy(_instance);
+
+            var rest = solver.Solve(bestNode.Vehicles, bestNode.Rides);
+
             return result;
         }
 
