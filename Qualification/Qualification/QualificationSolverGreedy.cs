@@ -33,6 +33,7 @@ namespace Windemann.HashCode.Qualification
                     vehicle.TimeAvailable = vehicle.TimeAvailable + pickedRide.Distance + vehicle.Position.DistanceTo(pickedRide.Start);
                     vehicle.Position = pickedRide.End;
                     timeQueue.Add(vehicle);
+                    result.AddAssignment(vehicle.Id, pickedRide.Id);
                 }
             } while (timeQueue.Any());
 
