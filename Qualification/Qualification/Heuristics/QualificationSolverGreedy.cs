@@ -38,7 +38,7 @@ namespace Windemann.HashCode.Qualification.Heuristics
 
         public IEnumerable<(int VehicleId, int RideId, int Score)> Solve(IEnumerable<Vehicle> vehicles, IEnumerable<Ride> rides, Dictionary<int, HashSet<int>> conflicts)
         {
-            var timeQueue = new SortedSet<Vehicle>(vehicles, new VehicleTimeComparer());
+            var timeQueue = new SortedSet<Vehicle>(vehicles.Select(v => new Vehicle(v.Id, v.Position, v.TimeAvailable)), new VehicleTimeComparer());
             
             var ridesLeft = rides.ToList();
 

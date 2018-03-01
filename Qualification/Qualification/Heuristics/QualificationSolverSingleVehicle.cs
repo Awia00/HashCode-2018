@@ -34,6 +34,9 @@ namespace Windemann.HashCode.Qualification.Heuristics
 
         public IEnumerable<(Ride Ride, int Score)> ChooseRidesForVehicle(Vehicle vehicle, IEnumerable<Ride> rides)
         {
+            // Deep copy
+            vehicle = new Vehicle(vehicle.Id, vehicle.Position, vehicle.TimeAvailable);
+            
             var rideSet = new HashSet<Ride>(rides);
             
             while (rideSet.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, _instance.NumberOfSteps)))

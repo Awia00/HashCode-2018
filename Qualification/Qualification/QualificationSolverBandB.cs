@@ -43,8 +43,12 @@ namespace Windemann.HashCode.Qualification
             var incumbent = root.LowerBound;
 
             priorityQueue.Add(root);
-            while (priorityQueue.Any() && !_cancellationToken.IsCancellationRequested)
-            {                
+            var lastIteration = 0;
+            var iterations = 0;
+            while (priorityQueue.Any() && iterations - lastIteration < 100)
+            {
+                iterations++;
+                Console.Error.Write($"Number of node: {priorityQueue.Count}\r");
                 var node = priorityQueue.Min;
                 priorityQueue.Remove(node);
                 
@@ -60,6 +64,9 @@ namespace Windemann.HashCode.Qualification
                     {
                         incumbent = child.LowerBound;
                         bestNode = child;
+                        
+                        Console.Error.WriteLine($"New incumbent: {incumbent}                    ");
+                        lastIteration = iterations;
                     }
                     
                     if (!MustBePruned(child, incumbent))
