@@ -20,7 +20,7 @@ namespace Windemann.HashCode.Qualification
         public QualificationResult Solve()
         {
             var vehicles = new List<Vehicle>();
-            for (int i = 0; i < _instance.NumberOfVehicles; i++)
+            for (var i = 0; i < _instance.NumberOfVehicles; i++)
             {
                 vehicles.Add(new Vehicle());
             }
@@ -89,8 +89,8 @@ namespace Windemann.HashCode.Qualification
 
         private (BbNode take, BbNode stay) GetChildren(BbNode node)
         {
-            Ride picked = null;
-            Vehicle v = null;
+            Ride pickedRide = null;
+            Vehicle pickedVehicle = null;
             foreach (var nodeVehicle in node.Vehicles)
             {
                 var ride = node.Rides.FirstOrDefault(x =>
@@ -98,13 +98,13 @@ namespace Windemann.HashCode.Qualification
                     && !node.Conflicts[nodeVehicle.Id].Contains(x.Id));
                 if (ride != null)
                 {
-                    v = nodeVehicle;
-                    picked = ride;
+                    pickedVehicle = nodeVehicle;
+                    pickedRide = ride;
                     break;
                 }
             }
 
-            if (picked == null)
+            if (pickedRide == null)
             {
                 return (new BbNode(_instance.NumberOfVehicles), new BbNode(_instance.NumberOfVehicles)); // they will have bad bounds
             }
@@ -112,17 +112,17 @@ namespace Windemann.HashCode.Qualification
             var stay = new BbNode(node);
             var take = new BbNode(node);
 
-            stay.Conflicts[v.Id].Add(picked.Id);
+            stay.Conflicts[pickedVehicle.Id].Add(pickedRide.Id);
 
-            take.Rides.Remove(picked);
-            var takeVehicle = take.Vehicles.Find(x => x.Id == v.Id);
-            takeVehicle.TimeAvailable += takeVehicle.PossiblePickupTime(picked) + picked.Distance;
+            take.Rides.Remove(pickedRide);
+            var takeVehicle = take.Vehicles.Find(x => x.Id == pickedVehicle.Id);
+            takeVehicle.TimeAvailable += takeVehicle.PossiblePickupTime(pickedRide) + pickedRide.Distance;
 
             take.Assignments.Add(new Assignment()
             {
-                RideId = picked.Id,
+                RideId = pickedRide.Id,
                 VehicleId = takeVehicle.Id,
-                Value = picked.Distance
+                Value = pickedRide.Distance + (pickedVehicle.PossiblePickupTime(pickedRide) == pickedRide.EarliestStart ? _instance.PerRideBonus : 0)
             });
 
             return (take, stay);
