@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
 {
@@ -8,35 +9,18 @@ namespace Windemann.HashCode.Qualification
         // Maps from vehicle id to ride ids.
         public Dictionary<int, List<int>> Assignments { get; }
 
-        public QualificationResult()
+        public QualificationResult(QualificationInstance instance)
         {
             Assignments = new Dictionary<int, List<int>>();
-        }
 
-        public QualificationResult(Dictionary<int, List<int>> assignments)
-        {
-            Assignments = assignments;
-        }
-
-        public void AddAssignment(int vehicleId, IEnumerable<int> rideIds)
-        {
-            if (!Assignments.ContainsKey(vehicleId))
+            for (var ride = 0; ride < instance.NumberOfRides; ++ride)
             {
-                Assignments[vehicleId] = new List<int>(rideIds);
-            }
-            else
-            {
-                Assignments[vehicleId].AddRange(rideIds);                
+                Assignments.Add(ride, new List<int>());
             }
         }
 
         public void AddAssignment(int vehicleId, int rideId)
         {
-            if (!Assignments.ContainsKey(vehicleId))
-            {
-                Assignments.Add(vehicleId, new List<int>());
-            }
-            
             Assignments[vehicleId].Add(rideId);
         }
         

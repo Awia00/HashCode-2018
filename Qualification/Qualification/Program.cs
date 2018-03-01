@@ -1,4 +1,5 @@
 ﻿using System;
+using Windemann.HashCode.Qualification.Heuristics;
 
 namespace Windemann.HashCode.Qualification
 {

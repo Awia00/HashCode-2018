@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Windemann.HashCode.Qualification.Model;
 
-namespace Windemann.HashCode.Qualification
+namespace Windemann.HashCode.Qualification.Heuristics
 {
-    class QualificationSolverGreedy : IQualificationSolver
+    public class QualificationSolverGreedy : IQualificationSolver
     {
         public QualificationResult Solve(QualificationInstance instance)
         {
@@ -17,7 +17,7 @@ namespace Windemann.HashCode.Qualification
 
             Console.Error.WriteLine("Created vehicles");
 
-            var result = new QualificationResult();
+            var result = new QualificationResult(instance);
             var ridesLeft = instance.Rides.ToList();
 
             do

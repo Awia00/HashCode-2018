@@ -22,5 +22,24 @@ namespace Windemann.HashCode.Qualification.Model
             LatestFinish = latestFinish;
             Distance = Start.DistanceTo(End);
         }
+
+        public int Score(QualificationInstance instance, int pickupTime)
+        {
+            var bonus = pickupTime <= EarliestStart ? instance.PerRideBonus : 0;
+
+            return bonus + Distance;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Ride;
+
+            return Id == other?.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Windemann.HashCode.Qualification.Model
+﻿using System;
+
+namespace Windemann.HashCode.Qualification.Model
 {
     public class Vehicle
     {
@@ -31,7 +33,10 @@
         {
             return Id;
         }
-        
-        
+
+        public int PossiblePickupTime(Ride ride)
+        {
+            return Math.Max(TimeAvailable + Position.DistanceTo(ride.Start), ride.EarliestStart);
+        }
     }
 }
