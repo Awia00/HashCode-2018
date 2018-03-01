@@ -40,12 +40,4 @@ namespace Windemann.HashCode.Qualification
             return null;
         }
     }
-
-    class VehicleTimeComparer : IComparer<Vehicle>
-    {
-        public int Compare(Vehicle x, Vehicle y)
-        {
-            return x.TimeAvailable <= y.TimeAvailable ? -1 : 1;
-        }
-    }
 }

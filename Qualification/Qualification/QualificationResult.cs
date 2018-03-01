@@ -5,21 +5,22 @@ namespace Windemann.HashCode.Qualification
 {
     public class QualificationResult
     {
-        public List<List<int>> Assignments { get; }
+        // Maps from vehicle id to ride ids.
+        public Dictionary<int, List<int>> Assignments { get; }
 
         public QualificationResult()
         {
-            Assignments = new List<List<int>>();
+            Assignments = new Dictionary<int, List<int>>();
         }
 
-        public QualificationResult(List<List<int>> assignments)
+        public QualificationResult(Dictionary<int, List<int>> assignments)
         {
             Assignments = assignments;
         }
 
-        public void AddAssignment(List<int> rideIds)
+        public void AddAssignment(int vehicleId, List<int> rideIds)
         {
-            Assignments.Add(rideIds);
+            Assignments.Add(vehicleId, rideIds);
         }
         
         public override string ToString()
@@ -28,9 +29,9 @@ namespace Windemann.HashCode.Qualification
             
             foreach (var assignment in Assignments)
             {
-                builder.Append(assignment.Count);
+                builder.Append(assignment.Value.Count);
 
-                foreach (var rideId in assignment)
+                foreach (var rideId in assignment.Value)
                 {
                     builder.Append(" ").Append(rideId);
                 }

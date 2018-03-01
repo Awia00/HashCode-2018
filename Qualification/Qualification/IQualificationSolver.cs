@@ -5,7 +5,7 @@ using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
 {
-    interface IQualificationSolver
+    public interface IQualificationSolver
     {
         QualificationResult Solve(QualificationInstance instance);
     }
