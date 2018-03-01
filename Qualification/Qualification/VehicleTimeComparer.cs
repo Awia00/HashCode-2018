@@ -7,7 +7,9 @@ namespace Windemann.HashCode.Qualification
     {
         public int Compare(Vehicle x, Vehicle y)
         {
-            return x.TimeAvailable <= y.TimeAvailable ? -1 : 1;
+            if (x.TimeAvailable < y.TimeAvailable)
+                return -1;
+            return x.TimeAvailable == y.TimeAvailable ? 0 : 1;
         }
     }
 }
