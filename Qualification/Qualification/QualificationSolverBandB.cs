@@ -11,12 +11,14 @@ namespace Windemann.HashCode.Qualification
     {
         private readonly QualificationInstance _instance;
         private readonly QualificationSolverSingleVehicle _upperHeuristic;
+        private readonly QualificationSolverGreedy _lowerHeuristic;
         private readonly CancellationToken _cancellationToken;
 
         public QualificationSolverBandB(QualificationInstance instance, CancellationToken cancellationToken)
         {
             _instance = instance;
             _upperHeuristic = new QualificationSolverSingleVehicle(_instance);
+            _lowerHeuristic = new QualificationSolverGreedy(_instance);
             _cancellationToken = cancellationToken;
         }
         
@@ -76,9 +78,11 @@ namespace Windemann.HashCode.Qualification
             {
                 result.AddAssignment(bestNodeAssignment.VehicleId, bestNodeAssignment.RideId);
             }
-            var solver = new QualificationSolverGreedy(_instance);
 
-            var rest = solver.Solve(bestNode.Vehicles, bestNode.Rides);
+            foreach (var valueTuple in _lowerHeuristic.Solve(bestNode.Vehicles, bestNode.Rides))
+            {
+                result.AddAssignment(valueTuple.VehicleId, valueTuple.RideId);
+            }
 
             return result;
         }
@@ -142,9 +146,7 @@ namespace Windemann.HashCode.Qualification
 
         private int LowerBound(BbNode node)
         {
-            var solver = new QualificationSolverGreedy(_instance);
-
-            return solver.Solve(node.Vehicles, node.Rides).Sum(r => r.Score);
+            return _lowerHeuristic.Solve(node.Vehicles, node.Rides).Sum(r => r.Score);
         }
     }
 }
