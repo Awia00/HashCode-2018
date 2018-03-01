@@ -18,21 +18,20 @@ namespace Windemann.HashCode.Qualification
                 timeQueue.Add(new Vehicle());
             }
 
+            var result = new QualificationResult();
+            var ridesLeft = instance.Rides.ToList();
+
             do
             {
                 var vehicle = timeQueue.Min;
                 timeQueue.Remove(vehicle);
 
-                var endTime = 0;
-                var endCoordinate = vehicle.Position;
+                var pickedRide = ridesLeft.OrderBy(x => x.LatestFinish + x.Distance + x.Start.DistanceTo(vehicle.Position)).FirstOrDefault(x => vehicle.TimeAvailable + x.Distance + x.Start.DistanceTo(vehicle.Position) < instance.NumberOfSteps);
 
-                // handle vehicle
-
-
-                if (endTime < instance.NumberOfSteps)
+                if (pickedRide != null)
                 {
-                    vehicle.TimeAvailable = endTime;
-                    vehicle.Position = endCoordinate;
+                    vehicle.TimeAvailable = vehicle.TimeAvailable + pickedRide.Distance + vehicle.Position.DistanceTo(pickedRide.Start);
+                    vehicle.Position = pickedRide.End;
                     timeQueue.Add(vehicle);
                 }
             } while (timeQueue.Any());
