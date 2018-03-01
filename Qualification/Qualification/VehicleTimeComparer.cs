@@ -9,7 +9,9 @@ namespace Windemann.HashCode.Qualification
         {
             if (x.TimeAvailable < y.TimeAvailable)
                 return -1;
-            return x.TimeAvailable == y.TimeAvailable ? 0 : 1;
+            if (x.TimeAvailable > y.TimeAvailable)
+                return 1;
+            return x.Id - y.Id;
         }
     }
 }
