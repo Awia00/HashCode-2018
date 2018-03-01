@@ -17,16 +17,18 @@ namespace Windemann.HashCode.Qualification.Heuristics
         public QualificationResult Solve()
         {
             var vehicles = new List<Vehicle>();
+            var conflicts = new Dictionary<int, HashSet<int>>();
             for (var i = 0; i < _instance.NumberOfVehicles; i++)
             {
                 vehicles.Add(new Vehicle());
+                conflicts.Add(i, new HashSet<int>());
             }
 
             Console.Error.WriteLine("Created vehicles");
 
             var result = new QualificationResult(_instance);
             
-            foreach (var assignment in Solve(vehicles, _instance.Rides))
+            foreach (var assignment in Solve(vehicles, _instance.Rides, conflicts))
             {
                 result.AddAssignment(assignment.VehicleId, assignment.RideId);
             }
@@ -34,7 +36,7 @@ namespace Windemann.HashCode.Qualification.Heuristics
             return result;
         }
 
-        public IEnumerable<(int VehicleId, int RideId, int Score)> Solve(IEnumerable<Vehicle> vehicles, IEnumerable<Ride> rides)
+        public IEnumerable<(int VehicleId, int RideId, int Score)> Solve(IEnumerable<Vehicle> vehicles, IEnumerable<Ride> rides, Dictionary<int, HashSet<int>> conflicts)
         {
             var timeQueue = new SortedSet<Vehicle>(vehicles, new VehicleTimeComparer());
             
@@ -47,7 +49,7 @@ namespace Windemann.HashCode.Qualification.Heuristics
 
                 var pickedRide = ridesLeft
                     .OrderBy(x => x.LatestFinish - x.Distance - (vehicle.TimeAvailable + x.Start.DistanceTo(vehicle.Position) <= x.EarliestStart ? _instance.PerRideBonus : 0))
-                    .FirstOrDefault(x => vehicle.PossiblePickupTime(x) + x.Distance < Math.Min(_instance.NumberOfSteps, x.LatestFinish));
+                    .FirstOrDefault(x => vehicle.PossiblePickupTime(x) + x.Distance < Math.Min(_instance.NumberOfSteps, x.LatestFinish) && !conflicts[vehicle.Id].Contains(x.Id));
 
                 if (pickedRide != null)
                 {

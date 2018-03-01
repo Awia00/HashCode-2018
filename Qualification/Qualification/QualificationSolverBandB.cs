@@ -73,7 +73,7 @@ namespace Windemann.HashCode.Qualification
                 result.AddAssignment(bestNodeAssignment.VehicleId, bestNodeAssignment.RideId);
             }
 
-            foreach (var valueTuple in _lowerHeuristic.Solve(bestNode.Vehicles, bestNode.Rides))
+            foreach (var valueTuple in _lowerHeuristic.Solve(bestNode.Vehicles, bestNode.Rides, bestNode.Conflicts))
             {
                 result.AddAssignment(valueTuple.VehicleId, valueTuple.RideId);
             }
@@ -135,12 +135,12 @@ namespace Windemann.HashCode.Qualification
 
         private int UpperBound(BbNode node)
         {
-            return node.Vehicles.Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides).Sum(r => r.Score)) + node.Assignments.Sum(x => x.Value);
+            return node.Vehicles.Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides, node.Conflicts).Sum(r => r.Score)) + node.Assignments.Sum(x => x.Value);
         }
 
         private int LowerBound(BbNode node)
         {
-            return _lowerHeuristic.Solve(node.Vehicles, node.Rides).Sum(r => r.Score) + node.Assignments.Sum(x => x.Value);
+            return _lowerHeuristic.Solve(node.Vehicles, node.Rides, node.Conflicts).Sum(r => r.Score) + node.Assignments.Sum(x => x.Value);
         }
     }
 }
