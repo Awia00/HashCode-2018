@@ -25,7 +25,9 @@ namespace Windemann.HashCode.Qualification
                 var vehicle = timeQueue.Min;
                 timeQueue.Remove(vehicle);
 
-                var pickedRide = ridesLeft.OrderBy(x => x.LatestFinish + x.Distance + x.Start.DistanceTo(vehicle.Position)).FirstOrDefault(x => vehicle.TimeAvailable + x.Distance + x.Start.DistanceTo(vehicle.Position) < instance.NumberOfSteps);
+                var pickedRide = ridesLeft
+                    .OrderBy(x => x.LatestFinish + 1d/x.Distance + (vehicle.TimeAvailable + x.Start.DistanceTo(vehicle.Position) <= x.EarliestStart ? instance.PerRideBonus : 0))
+                    .FirstOrDefault(x => vehicle.TimeAvailable + x.Distance + x.Start.DistanceTo(vehicle.Position) < Math.Min(instance.NumberOfSteps, x.LatestFinish));
 
                 if (pickedRide != null)
                 {
