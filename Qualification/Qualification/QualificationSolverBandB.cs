@@ -46,7 +46,7 @@ namespace Windemann.HashCode.Qualification
                     priorityQueue.Add(stay);
             }
 
-            var result = new QualificationResult();
+            var result = new QualificationResult(instance);
             foreach (var bestNodeAssignment in bestNode.Assignments)
             {
                 result.AddAssignment(bestNodeAssignment.VehicleId, bestNodeAssignment.RideId);
