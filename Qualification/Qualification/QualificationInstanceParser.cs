@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
 {
@@ -7,7 +8,7 @@ namespace Windemann.HashCode.Qualification
     {
         public override QualificationInstance ParseInstance(TextReader reader)
         {
-            throw new NotImplementedException();
+            var line = reader.ReadLine();
         }
     }
 }
