@@ -10,9 +10,22 @@ namespace Windemann.HashCode.Qualification
     {
         public QualificationResult Solve(QualificationInstance instance)
         {
+            var vehicles = new List<Vehicle>();
+            for (int i = 0; i < instance.NumberOfVehicles; i++)
+            {
+                vehicles.Add(new Vehicle());
+            }
+            var ridesLeft = new SortedSet<Ride>(new RideComparer());
+            foreach (var instanceRide in instance.Rides)
+            {
+                ridesLeft.Add(instanceRide);
+            }
+
             var root = new BbNode();
             root.LowerBound = LowerBound(root);
             root.UpperBound = UpperBound(root);
+            root.Vehicles = vehicles;
+            root.Rides = ridesLeft;
 
             var priorityQueue = new SortedSet<BbNode>();
             var bestNode = root;
@@ -27,7 +40,7 @@ namespace Windemann.HashCode.Qualification
                 if(node.UpperBound <= incumbent)
                     continue;
 
-                var (take, stay) = getChildren(node);
+                var (take, stay) = GetChildren(node);
                 take.UpperBound = UpperBound(take);
                 take.LowerBound = LowerBound(take);
                 stay.UpperBound = UpperBound(stay);
@@ -64,9 +77,15 @@ namespace Windemann.HashCode.Qualification
             return false;
         }
 
-        private (BbNode node1, BbNode node2) getChildren(BbNode node)
+
+        private (BbNode node1, BbNode node2) GetChildren(BbNode node)
         {
-            // pick a ride
+            foreach (var nodeVehicle in node.Vehicles)
+            {
+                node.Rides.FirstOrDefault(x =>
+                    nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, instance.NumberOfTimeSteps));
+            }
+
             return (node, node);
         }
 

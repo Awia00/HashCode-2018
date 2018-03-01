@@ -1,6 +1,6 @@
 ﻿namespace Windemann.HashCode.Qualification
 {
-    class Assignment
+    public class Assignment
     {
         public double Value { get; }
         public int VehicleId { get; }
