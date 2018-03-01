@@ -103,7 +103,7 @@ namespace Windemann.HashCode.Qualification
         {
             Ride pickedRide = null;
             Vehicle pickedVehicle = null;
-            foreach (var nodeVehicle in node.Vehicles)
+            foreach (var nodeVehicle in node.Vehicles.AsParallel().OrderBy(x => x.TimeAvailable))
             {
                 var ride = node.Rides.FirstOrDefault(x => nodeVehicle.CanPickup(x, _instance.NumberOfSteps)
                     && !node.Conflicts[nodeVehicle.Id].Contains(x.Id));
@@ -126,14 +126,13 @@ namespace Windemann.HashCode.Qualification
             stay.Conflicts[pickedVehicle.Id].Add(pickedRide.Id);
 
             take.Rides.Remove(pickedRide);
-            var takeVehicle = take.Vehicles.Find(x => x.Id == pickedVehicle.Id);
-            take.Vehicles.Remove(takeVehicle);
-            take.Vehicles.Add(new Vehicle(takeVehicle.Id, pickedRide.End, takeVehicle.PossiblePickupTime(pickedRide) + pickedRide.Distance));
+            take.Vehicles.Remove(pickedVehicle);
+            take.Vehicles.Add(new Vehicle(pickedVehicle.Id, pickedRide.End, pickedVehicle.PossiblePickupTime(pickedRide) + pickedRide.Distance));
 
             take.Assignments.Add(new Assignment
             {
                 RideId = pickedRide.Id,
-                VehicleId = takeVehicle.Id,
+                VehicleId = pickedVehicle.Id,
                 Value = pickedRide.Score(_instance, pickedVehicle.PossiblePickupTime(pickedRide))
             });
 
