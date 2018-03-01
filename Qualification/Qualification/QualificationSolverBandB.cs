@@ -135,12 +135,12 @@ namespace Windemann.HashCode.Qualification
 
         private int UpperBound(BbNode node)
         {
-            return node.Vehicles.Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides).Sum(r => r.Score));
+            return node.Vehicles.Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides).Sum(r => r.Score)) + node.Assignments.Sum(x => x.Value);
         }
 
         private int LowerBound(BbNode node)
         {
-            return _lowerHeuristic.Solve(node.Vehicles, node.Rides).Sum(r => r.Score);
+            return _lowerHeuristic.Solve(node.Vehicles, node.Rides).Sum(r => r.Score) + node.Assignments.Sum(x => x.Value);
         }
     }
 }
