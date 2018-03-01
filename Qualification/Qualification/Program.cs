@@ -19,16 +19,12 @@ namespace Windemann.HashCode.Qualification
             
             Console.Error.WriteLine("Instance has been parsed.");
 
-            var result = FindResult(instance);
+            var solver = new QualificationSolverGreedy();
+            var result = solver.Solve(instance);
 
             Console.Error.WriteLine("Result has been computed.");
 
             Console.WriteLine(result);
-        }
-
-        static QualificationResult FindResult(QualificationInstance instance)
-        {
-            throw new NotImplementedException();
         }
     }
 }
