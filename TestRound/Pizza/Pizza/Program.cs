@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Pizza
 {
@@ -6,7 +7,20 @@ namespace Pizza
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var parser = new PizzaParser();
+
+            var instance = parser.ParseInstance("/home/mikael/Hentet/small.in");
+            
+            
+            
+            
+
+            Console.WriteLine(instance);
+        }
+
+        private IEnumerable<PizzaSlice> GenerateAllSlices(PizzaInstance instance)
+        {
+            
         }
     }
 }
