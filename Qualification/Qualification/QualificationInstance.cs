@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Qualification
+namespace Windemann.HashCode.Qualification
 {
     public class QualificationInstance
     {

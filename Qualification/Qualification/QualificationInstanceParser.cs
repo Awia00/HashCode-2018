@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Qualification
+namespace Windemann.HashCode.Qualification
 {
     public sealed class QualificationInstanceParser : InstanceParser<QualificationInstance>
     {

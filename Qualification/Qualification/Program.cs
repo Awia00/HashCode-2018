@@ -1,14 +1,15 @@
 ﻿using System;
 
-namespace Qualification
+namespace Windemann.HashCode.Qualification
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
             if (args.Length != 1)
             {
-                Console.Error.WriteLine("Usage: dotnet Qualification.dll <filename>");
+                Console.Error.WriteLine("Usage (Windows): Qualification.exe <filename>");
+                Console.Error.WriteLine("Usage (Ubuntu): dotnet Qualification.dll <filename>");
                 return;
             }
             

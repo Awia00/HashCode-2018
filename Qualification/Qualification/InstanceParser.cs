@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Qualification
+namespace Windemann.HashCode.Qualification
 {
     public abstract class InstanceParser<TInstance>
     {
@@ -9,6 +9,11 @@ namespace Qualification
 
         public virtual TInstance ParseInstance(string filename)
         {
+            if (!File.Exists(filename))
+            {
+                throw new ArgumentException($"File '{filename}' not found.");
+            }
+            
             using (var file = File.OpenRead(filename))
             {
                 using (var reader = new StreamReader(file))
