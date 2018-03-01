@@ -18,14 +18,26 @@ namespace Windemann.HashCode.Qualification
             Assignments = assignments;
         }
 
-        public void AddAssignment(int vehicleId, List<int> rideIds)
+        public void AddAssignment(int vehicleId, IEnumerable<int> rideIds)
         {
-            Assignments.Add(vehicleId, rideIds);
+            if (!Assignments.ContainsKey(vehicleId))
+            {
+                Assignments[vehicleId] = new List<int>(rideIds);
+            }
+            else
+            {
+                Assignments[vehicleId].AddRange(rideIds);                
+            }
         }
 
         public void AddAssignment(int vehicleId, int rideId)
         {
+            if (!Assignments.ContainsKey(vehicleId))
+            {
+                Assignments.Add(vehicleId, new List<int>());
+            }
             
+            Assignments[vehicleId].Add(rideId);
         }
         
         public override string ToString()
