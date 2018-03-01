@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Windemann.HashCode.Qualification.Heuristics;
 using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
@@ -19,12 +17,12 @@ namespace Windemann.HashCode.Qualification
         public QualificationResult Solve()
         {
             var vehicles = new List<Vehicle>();
-            for (int i = 0; i < instance.NumberOfVehicles; i++)
+            for (int i = 0; i < _instance.NumberOfVehicles; i++)
             {
                 vehicles.Add(new Vehicle());
             }
             var ridesLeft = new SortedSet<Ride>(new RideComparer());
-            foreach (var instanceRide in instance.Rides)
+            foreach (var instanceRide in _instance.Rides)
             {
                 ridesLeft.Add(instanceRide);
             }
