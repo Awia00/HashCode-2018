@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Windemann.HashCode.Qualification.Model
 {
@@ -26,7 +26,16 @@ namespace Windemann.HashCode.Qualification.Model
         
         public override string ToString()
         {
-            throw new NotImplementedException();
+            var builder = new StringBuilder();
+
+            builder.AppendLine($"{Rows} {Columns} {NumberOfVehicles} {NumberOfRides} {PerRideBonus} {NumberOfSteps}");
+            
+            foreach (var ride in Rides)
+            {
+                builder.AppendLine($"{ride.Start.Row} {ride.Start.Column} {ride.End.Row} {ride.End.Column} {ride.EarliestStart} {ride.LatestFinish}");
+            }
+
+            return builder.ToString();
         }
     }
 }
