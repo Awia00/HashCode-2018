@@ -16,7 +16,7 @@ namespace Windemann.HashCode.Qualification
         {
             for (int i = 0; i < numVehicles; i++)
             {
-                Conflicts.Add(i, new HashSet<int>);
+                Conflicts.Add(i, new HashSet<int>());
             }
         }
 
