@@ -31,14 +31,15 @@ namespace Windemann.HashCode.Qualification
 
                 if (pickedRide != null)
                 {
-                    vehicle.TimeAvailable = vehicle.TimeAvailable + pickedRide.Distance + vehicle.Position.DistanceTo(pickedRide.Start);
+                    vehicle.TimeAvailable = Math.Max(vehicle.TimeAvailable + vehicle.Position.DistanceTo(pickedRide.Start), pickedRide.EarliestStart) + pickedRide.Distance;
                     vehicle.Position = pickedRide.End;
                     timeQueue.Add(vehicle);
                     ridesLeft.Remove(pickedRide);
                     result.AddAssignment(vehicle.Id, pickedRide.Id);
-                    Console.Error.WriteLine($"Assigned ride {pickedRide.Id} to vehicle {vehicle.Id}");
+                    Console.Error.Write($"\rAssigned ride {pickedRide.Id} to vehicle {vehicle.Id}");
                 }
             } while (timeQueue.Any());
+            Console.Error.WriteLine();
 
             return result;
         }
