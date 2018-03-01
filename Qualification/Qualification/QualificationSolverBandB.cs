@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Windemann.HashCode.Qualification.Heuristics;
 using Windemann.HashCode.Qualification.Model;
 
@@ -10,11 +11,13 @@ namespace Windemann.HashCode.Qualification
     {
         private readonly QualificationInstance _instance;
         private readonly QualificationSolverSingleVehicle _upperHeuristic;
+        private readonly CancellationToken _cancellationToken;
 
-        public QualificationSolverBandB(QualificationInstance instance)
+        public QualificationSolverBandB(QualificationInstance instance, CancellationToken cancellationToken)
         {
             _instance = instance;
             _upperHeuristic = new QualificationSolverSingleVehicle(_instance);
+            _cancellationToken = cancellationToken;
         }
         
         public QualificationResult Solve()
@@ -43,6 +46,12 @@ namespace Windemann.HashCode.Qualification
             priorityQueue.Add(root);
             while (priorityQueue.Any())
             {
+                if (_cancellationToken.IsCancellationRequested)
+                {
+                    // TODO: Make the solution from this.
+                    throw new NotImplementedException();
+                }
+                
                 var node = priorityQueue.Min;
                 priorityQueue.Remove(node);
                 

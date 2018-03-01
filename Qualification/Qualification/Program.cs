@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Windemann.HashCode.Qualification.Heuristics;
 
 namespace Windemann.HashCode.Qualification
@@ -7,6 +8,9 @@ namespace Windemann.HashCode.Qualification
     {
         static void Main(string[] args)
         {
+            var tokenSource = new CancellationTokenSource();
+            Console.CancelKeyPress += (sender, eventArgs) => tokenSource.Cancel();
+            
             if (args.Length != 1)
             {
                 Console.Error.WriteLine("Usage (Windows): Qualification.exe <filename>");
@@ -20,6 +24,7 @@ namespace Windemann.HashCode.Qualification
             
             Console.Error.WriteLine("Instance has been parsed.");
 
+            // var solver = new QualificationSolverBandB(instance, tokenSource.Token);
             var solver = new QualificationSolverGreedy(instance);
             var result = solver.Solve();
 
