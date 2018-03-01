@@ -27,7 +27,7 @@ namespace Windemann.HashCode.Qualification
                 ridesLeft.Add(instanceRide);
             }
 
-            var root = new BbNode();
+            var root = new BbNode(_instance.NumberOfVehicles);
             root.LowerBound = LowerBound(root);
             root.UpperBound = UpperBound(root);
             root.Vehicles = vehicles;
@@ -84,15 +84,18 @@ namespace Windemann.HashCode.Qualification
         }
 
 
-        private (BbNode node1, BbNode node2) GetChildren(BbNode node)
+        private (BbNode take, BbNode stay) GetChildren(BbNode node)
         {
             Ride picked = null;
+            Vehicle v = null;
             foreach (var nodeVehicle in node.Vehicles)
             {
                 var ride = node.Rides.FirstOrDefault(x =>
-                    nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, _instance.NumberOfSteps));
+                    nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, _instance.NumberOfSteps)
+                    && !node.Conflicts[nodeVehicle.Id].Contains(x.Id));
                 if (ride != null)
                 {
+                    v = nodeVehicle;
                     picked = ride;
                     break;
                 }
@@ -100,11 +103,26 @@ namespace Windemann.HashCode.Qualification
 
             if (picked == null)
             {
-                return (new BbNode(), new BbNode()); // they will have bad bounds
+                return (new BbNode(_instance.NumberOfVehicles), new BbNode(_instance.NumberOfVehicles)); // they will have bad bounds
             }
-            var take = new BbNode();
-            var stay = new BbNode();
-            return (node, node);
+
+            var stay = new BbNode(node);
+            var take = new BbNode(node);
+
+            stay.Conflicts[v.Id].Add(picked.Id);
+
+            take.Rides.Remove(picked);
+            var takeVehicle = take.Vehicles.Find(x => x.Id == v.Id);
+            takeVehicle.TimeAvailable += takeVehicle.PossiblePickupTime(picked) + picked.Distance;
+
+            take.Assignments.Add(new Assignment()
+            {
+                RideId = picked.Id,
+                VehicleId = takeVehicle.Id,
+                Value = picked.Distance
+            });
+
+            return (take, stay);
         }
 
         private int UpperBound(BbNode node)

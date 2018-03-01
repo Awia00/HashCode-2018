@@ -2,8 +2,8 @@
 {
     public class Assignment
     {
-        public double Value { get; }
-        public int VehicleId { get; }
+        public double Value { get; set; }
+        public int VehicleId { get; set; }
         public int RideId { get; set; }
     }
 }
