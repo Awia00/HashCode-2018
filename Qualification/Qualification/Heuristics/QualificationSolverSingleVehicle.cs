@@ -7,31 +7,48 @@ namespace Windemann.HashCode.Qualification.Heuristics
 {
     public class QualificationSolverSingleVehicle : IQualificationSolver
     {
-        public QualificationResult Solve(QualificationInstance instance)
-        {
-            var rides = new HashSet<Ride>(instance.Rides);
-            var result = new QualificationResult(instance);
+        private readonly QualificationInstance _instance;
 
-            for (var i = 0; i < instance.NumberOfVehicles; i++)
+        public QualificationSolverSingleVehicle(QualificationInstance instance)
+        {
+            _instance = instance;
+        }
+        
+        public QualificationResult Solve()
+        {
+            var rides = new HashSet<Ride>(_instance.Rides);
+            var result = new QualificationResult(_instance);
+
+            for (var i = 0; i < _instance.NumberOfVehicles; i++)
             {
                 var vehicle = new Vehicle();
 
-                while (rides.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps)))
+                foreach (var ride in ChooseRidesForVehicle(_instance, vehicle, rides))
                 {
-                    var chosenRide = rides
-                        .Where(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps))
-                        .OrderByDescending(ride => ride.Score(instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(ride.Start)))
-                        .First();
-
-                    result.AddAssignment(vehicle.Id, chosenRide.Id);
-                    rides.Remove(chosenRide);
-
-                    vehicle.Position = chosenRide.End;
-                    vehicle.TimeAvailable = vehicle.PossiblePickupTime(chosenRide) + chosenRide.Distance;
+                    result.AddAssignment(vehicle.Id, ride.Id);
                 }
             }
 
             return result;
+        }
+
+        public IEnumerable<Ride> ChooseRidesForVehicle(QualificationInstance instance, Vehicle vehicle, IEnumerable<Ride> rides)
+        {
+            var rideSet = new HashSet<Ride>(rides);
+            
+            while (rideSet.Any(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps)))
+            {
+                var chosenRide = rideSet
+                    .Where(ride => vehicle.PossiblePickupTime(ride) + ride.Distance <= Math.Min(ride.LatestFinish, instance.NumberOfSteps))
+                    .OrderByDescending(ride => ride.Score(instance, vehicle.TimeAvailable + vehicle.Position.DistanceTo(ride.Start)))
+                    .First();
+
+                yield return chosenRide;
+                rideSet.Remove(chosenRide);
+
+                vehicle.Position = chosenRide.End;
+                vehicle.TimeAvailable = vehicle.PossiblePickupTime(chosenRide) + chosenRide.Distance;
+            }
         }
     }
 }

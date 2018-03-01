@@ -7,6 +7,6 @@ namespace Windemann.HashCode.Qualification
 {
     public interface IQualificationSolver
     {
-        QualificationResult Solve(QualificationInstance instance);
+        QualificationResult Solve();
     }
 }

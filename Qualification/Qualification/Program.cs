@@ -20,8 +20,8 @@ namespace Windemann.HashCode.Qualification
             
             Console.Error.WriteLine("Instance has been parsed.");
 
-            var solver = new QualificationSolverGreedy();
-            var result = solver.Solve(instance);
+            var solver = new QualificationSolverGreedy(instance);
+            var result = solver.Solve();
 
             Console.Error.WriteLine("Result has been computed.");
 

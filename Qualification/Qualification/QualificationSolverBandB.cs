@@ -2,13 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Windemann.HashCode.Qualification.Heuristics;
 using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
 {
     public class QualificationSolverBandB : IQualificationSolver
     {
-        public QualificationResult Solve(QualificationInstance instance)
+        private readonly QualificationInstance _instance;
+
+        public QualificationSolverBandB(QualificationInstance instance)
+        {
+            _instance = instance;
+        }
+        
+        public QualificationResult Solve()
         {
             var vehicles = new List<Vehicle>();
             for (int i = 0; i < instance.NumberOfVehicles; i++)
@@ -59,7 +67,7 @@ namespace Windemann.HashCode.Qualification
                     priorityQueue.Add(stay);
             }
 
-            var result = new QualificationResult(instance);
+            var result = new QualificationResult(_instance);
             foreach (var bestNodeAssignment in bestNode.Assignments)
             {
                 result.AddAssignment(bestNodeAssignment.VehicleId, bestNodeAssignment.RideId);
