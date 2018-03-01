@@ -22,6 +22,11 @@ namespace Windemann.HashCode.Qualification
         {
             Assignments.Add(vehicleId, rideIds);
         }
+
+        public void AddAssignment(int vehicleId, int rideId)
+        {
+            
+        }
         
         public override string ToString()
         {
