@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Windemann.HashCode.Qualification.Model;
 
-namespace Windemann.HashCode.Qualification
+namespace Windemann.HashCode.Qualification.Heuristics
 {
-    class QualificationSolverGreedy : IQualificationSolver
+    public class QualificationSolverGreedy : IQualificationSolver
     {
         public QualificationResult Solve(QualificationInstance instance)
         {
@@ -17,7 +17,7 @@ namespace Windemann.HashCode.Qualification
 
             Console.Error.WriteLine("Created vehicles");
 
-            var result = new QualificationResult();
+            var result = new QualificationResult(instance);
             var ridesLeft = instance.Rides.ToList();
 
             do
@@ -31,14 +31,15 @@ namespace Windemann.HashCode.Qualification
 
                 if (pickedRide != null)
                 {
-                    vehicle.TimeAvailable = vehicle.TimeAvailable + pickedRide.Distance + vehicle.Position.DistanceTo(pickedRide.Start);
+                    vehicle.TimeAvailable = Math.Max(vehicle.TimeAvailable + vehicle.Position.DistanceTo(pickedRide.Start), pickedRide.EarliestStart) + pickedRide.Distance;
                     vehicle.Position = pickedRide.End;
                     timeQueue.Add(vehicle);
                     ridesLeft.Remove(pickedRide);
                     result.AddAssignment(vehicle.Id, pickedRide.Id);
-                    Console.Error.WriteLine($"Assigned ride {pickedRide.Id} to vehicle {vehicle.Id}");
+                    Console.Error.Write($"\rAssigned ride {pickedRide.Id} to vehicle {vehicle.Id}");
                 }
             } while (timeQueue.Any());
+            Console.Error.WriteLine();
 
             return result;
         }
