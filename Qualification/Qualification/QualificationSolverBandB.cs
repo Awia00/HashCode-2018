@@ -91,7 +91,7 @@ namespace Windemann.HashCode.Qualification
             foreach (var nodeVehicle in node.Vehicles)
             {
                 node.Rides.FirstOrDefault(x =>
-                    nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, instance.NumberOfTimeSteps));
+                    nodeVehicle.PossiblePickupTime(x) < Math.Min(x.LatestFinish, _instance.NumberOfSteps));
             }
 
             return (node, node);
