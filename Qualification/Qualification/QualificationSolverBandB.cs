@@ -10,16 +10,12 @@ namespace Windemann.HashCode.Qualification
     public class QualificationSolverBandB : IQualificationSolver
     {
         private readonly QualificationInstance _instance;
-        private readonly QualificationSolverSingleVehicle _upperHeuristic;
         private readonly QualificationSolverGreedy _lowerHeuristic;
-        private readonly CancellationToken _cancellationToken;
 
-        public QualificationSolverBandB(QualificationInstance instance, CancellationToken cancellationToken)
+        public QualificationSolverBandB(QualificationInstance instance)
         {
             _instance = instance;
-            _upperHeuristic = new QualificationSolverSingleVehicle(_instance);
             _lowerHeuristic = new QualificationSolverGreedy(_instance);
-            _cancellationToken = cancellationToken;
         }
         
         
@@ -45,7 +41,8 @@ namespace Windemann.HashCode.Qualification
             priorityQueue.Add(root);
             var lastIteration = 0;
             var iterations = 0;
-            while (priorityQueue.Any() && iterations - lastIteration < 100)
+            var startTime = DateTime.Now;
+            while (priorityQueue.Any() && iterations - lastIteration < 100 && DateTime.Now - startTime < TimeSpan.FromMinutes(2))
             {
                 iterations++;
                 Console.Error.Write($"Number of node: {priorityQueue.Count}\r");
@@ -142,12 +139,12 @@ namespace Windemann.HashCode.Qualification
 
         private int UpperBound(BbNode node)
         {
-            return node.Vehicles.Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides, node.Conflicts).Sum(r => r.Score)) + node.Assignments.Sum(x => x.Value);
+            return node.Vehicles.AsParallel().Sum(vehicle => _lowerHeuristic.Solve(new [] { vehicle }, node.Rides, node.Conflicts).Sum(r => r.Score)) + node.Assignments.Sum(x => x.Value);
         }
 
         private int LowerBound(BbNode node)
         {
-            return _lowerHeuristic.Solve(node.Vehicles, node.Rides, node.Conflicts).Sum(r => r.Score) + node.Assignments.Sum(x => x.Value);
+            return _lowerHeuristic.Solve(node.Vehicles, node.Rides, node.Conflicts).AsParallel().Sum(r => r.Score) + node.Assignments.Sum(x => x.Value);
         }
     }
 }
