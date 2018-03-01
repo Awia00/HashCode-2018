@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Windemann.HashCode.Qualification.Model
+﻿namespace Windemann.HashCode.Qualification.Model
 {
     public class Vehicle
     {
@@ -17,5 +13,25 @@ namespace Windemann.HashCode.Qualification.Model
             Id = _id++;
             Position = new Coordinate();
         }
+
+        protected bool Equals(Vehicle other)
+        {
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Vehicle) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
+        
+        
     }
 }

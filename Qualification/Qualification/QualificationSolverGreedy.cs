@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using Windemann.HashCode.Qualification.Model;
 
 namespace Windemann.HashCode.Qualification
@@ -17,6 +14,8 @@ namespace Windemann.HashCode.Qualification
             {
                 timeQueue.Add(new Vehicle());
             }
+
+            Console.Error.WriteLine("Created vehicles");
 
             var result = new QualificationResult();
             var ridesLeft = instance.Rides.ToList();
@@ -34,10 +33,11 @@ namespace Windemann.HashCode.Qualification
                     vehicle.Position = pickedRide.End;
                     timeQueue.Add(vehicle);
                     result.AddAssignment(vehicle.Id, pickedRide.Id);
+                    Console.Error.WriteLine($"Assigned ride {pickedRide.Id} to vehicle {vehicle.Id}");
                 }
             } while (timeQueue.Any());
 
-            return null;
+            return result;
         }
     }
 }
