@@ -48,7 +48,7 @@ namespace Windemann.HashCode.Qualification.Heuristics
                 timeQueue.Remove(vehicle);
 
                 var pickedRide = ridesLeft
-                    .OrderBy(x => x.LatestFinish + vehicle.Position.DistanceTo(x.Start) - x.Distance - (vehicle.TimeAvailable + x.Start.DistanceTo(vehicle.Position) <= x.EarliestStart ? _instance.PerRideBonus : 0))
+                    .OrderByDescending(x => x.Score(_instance, vehicle.PossiblePickupTime(x)) - (vehicle.Position.DistanceTo(x.Start) + x.LatestFinish))
                     .FirstOrDefault(x => vehicle.PossiblePickupTime(x) + x.Distance < Math.Min(_instance.NumberOfSteps, x.LatestFinish) && !conflicts[vehicle.Id].Contains(x.Id));
 
                 if (pickedRide != null)

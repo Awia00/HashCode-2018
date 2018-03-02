@@ -9,11 +9,13 @@ namespace Windemann.HashCode.Qualification
         // Maps from vehicle id to ride ids.
         public Dictionary<int, List<int>> Assignments { get; }
 
+        public int Score { get; set; }
+
         public QualificationResult(QualificationInstance instance)
         {
             Assignments = new Dictionary<int, List<int>>();
 
-            for (var ride = 0; ride < instance.NumberOfRides; ++ride)
+            for (var ride = 0; ride < instance.NumberOfVehicles; ++ride)
             {
                 Assignments.Add(ride, new List<int>());
             }
@@ -23,7 +25,13 @@ namespace Windemann.HashCode.Qualification
         {
             Assignments[vehicleId].Add(rideId);
         }
-        
+
+        public void AddAssignment(int vehicleId, int rideId, int score)
+        {
+            Assignments[vehicleId].Add(rideId);
+            Score += score;
+        }
+
         public override string ToString()
         {
             var builder = new StringBuilder();
