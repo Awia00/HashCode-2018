@@ -11,11 +11,13 @@ namespace Windemann.HashCode.Qualification
     {
         private readonly QualificationInstance _instance;
         private readonly QualificationSolverGreedy _lowerHeuristic;
+        private readonly CancellationToken _ct;
 
-        public QualificationSolverBandB(QualificationInstance instance)
+        public QualificationSolverBandB(QualificationInstance instance, CancellationToken ct)
         {
             _instance = instance;
             _lowerHeuristic = new QualificationSolverGreedy(_instance);
+            _ct = ct;
         }
         
         
@@ -39,18 +41,17 @@ namespace Windemann.HashCode.Qualification
             var incumbent = root.LowerBound;
 
             priorityQueue.Add(root);
-            var lastIteration = 0;
             var iterations = 0;
-            var startTime = DateTime.Now;
-            while (priorityQueue.Any() && iterations - lastIteration < 100 && DateTime.Now - startTime < TimeSpan.FromMinutes(2))
+            while (priorityQueue.Any() && !_ct.IsCancellationRequested)
             {
                 iterations++;
-                Console.Error.Write($"Number of node: {priorityQueue.Count}\r");
                 var node = priorityQueue.Min;
                 priorityQueue.Remove(node);
                 
                 if(node.UpperBound <= incumbent)
                     continue;
+                
+                Console.Error.Write($"Nodes processed: {iterations} - Number of nodes left: {priorityQueue.Count} - Upper bound: {node.UpperBound}\r");
 
                 foreach (var child in GetChildren(node))
                 {
@@ -63,7 +64,6 @@ namespace Windemann.HashCode.Qualification
                         bestNode = child;
                         
                         Console.Error.WriteLine($"New incumbent: {incumbent}                    ");
-                        lastIteration = iterations;
                     }
                     
                     if (!MustBePruned(child, incumbent))
