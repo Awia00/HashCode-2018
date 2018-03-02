@@ -10,7 +10,7 @@ namespace Windemann.HashCode.Qualification
                 return -1;
             if (x.UpperBound > y.UpperBound)
                 return 1;
-            return x.GetHashCode() - y.GetHashCode();
+            return x.LowerBound - y.LowerBound;
         }
     }
 }

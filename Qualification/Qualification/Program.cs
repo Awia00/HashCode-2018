@@ -8,6 +8,13 @@ namespace Windemann.HashCode.Qualification
     {
         static void Main(string[] args)
         {
+            var tokenSource = new CancellationTokenSource();
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                eventArgs.Cancel = true;
+                tokenSource.Cancel();
+            };
+            
             if (args.Length != 1)
             {
                 Console.Error.WriteLine("Usage (Windows): Qualification.exe <filename>");
@@ -21,8 +28,8 @@ namespace Windemann.HashCode.Qualification
             
             Console.Error.WriteLine("Instance has been parsed.");
 
-            var solver = new QualificationSolverRandomized(instance);
-//            var solver = new QualificationSolverGreedy(instance);
+            var solver = new QualificationSolverBandB(instance, tokenSource.Token);
+
             var result = solver.Solve();
 
             Console.Error.WriteLine("Result has been computed.");
